@@ -23,6 +23,8 @@ The workflow is inspired by practical challenges in retail and refurbished elect
 
 ## 📂 Repository Structure
 
+```
+
 causal-pricing-lab/
 ├─ README.md
 ├─ LICENSE
@@ -58,7 +60,7 @@ causal-pricing-lab/
 ├─ figures/
 └─ slides/pricing_insights.pdf
 
-
+```
 ---
 
 ## ⚙️ Setup
