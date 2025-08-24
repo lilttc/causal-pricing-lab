@@ -1,0 +1,3 @@
+raw_sales: "data/raw/sales.csv"
+interim_clean: "data/interim/sales_clean.parquet"
+processed_daily: "data/processed/daily_product_city.parquet"
