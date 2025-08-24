@@ -1,7 +1,7 @@
 from __future__ import annotations
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import seaborn as sns
 
 def barh_elasticities(df: pd.DataFrame, coef_col: str = "coef", label_col: str = "group", top: int = 20):
     """
@@ -109,5 +109,46 @@ def compare_elasticities(
     ax.set_xlabel("Own-price elasticity (β)")
     ax.set_ylabel(on.title())
     ax.axvline(0, linestyle="--", linewidth=1)
+    plt.tight_layout()
+    return ax
+
+def heatmap_cross_price(
+    M: pd.DataFrame,
+    products: list[str] | None = None,
+    title: str | None = "Cross-Price Elasticities (rows: demand_i, cols: price_j)",
+    fmt: str = ".2f",
+):
+    """
+    Draws a heatmap for a K×K cross-price elasticity matrix.
+
+    Parameters
+    ----------
+    M : pd.DataFrame
+        Matrix with index = focal (demand for i) and columns = price of j.
+    products : list[str] | None
+        Optional ordered product list to select/reorder rows/cols.
+    title : str | None
+        Title to display above the heatmap.
+    fmt : str
+        Number format for annotations.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+        The matplotlib axes object.
+    """
+    if products is not None:
+        M = M.reindex(index=products, columns=products)
+
+    k = len(M.index)
+    fig_w = max(6.0, 0.9 * k)
+    fig_h = max(5.0, 0.85 * k)
+
+    plt.figure(figsize=(fig_w, fig_h))
+    ax = sns.heatmap(M, annot=True, fmt=fmt, cmap="coolwarm", center=0, square=True)
+    if title:
+        ax.set_title(title)
+    ax.set_xlabel("Price of j")
+    ax.set_ylabel("Demand for i")
     plt.tight_layout()
     return ax
