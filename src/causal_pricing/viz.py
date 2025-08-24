@@ -2,6 +2,7 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 def barh_elasticities(df: pd.DataFrame, coef_col: str = "coef", label_col: str = "group", top: int = 20):
     """
@@ -150,5 +151,81 @@ def heatmap_cross_price(
         ax.set_title(title)
     ax.set_xlabel("Price of j")
     ax.set_ylabel("Demand for i")
+    plt.tight_layout()
+    return ax
+
+def bar_revenue_change(df: pd.DataFrame, value_col: str = "d_rev_abs", label_col: str = "product", top: int = 20):
+    """
+    Horizontal bar chart of revenue change by product for a scenario table produced by ScenarioResult.to_frame().
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Must include [label_col, value_col].
+    value_col : str, default="d_rev_abs"
+        Absolute revenue change per product.
+    label_col : str, default="product"
+        Product label column.
+    top : int, default=20
+        Number of rows to display after sorting by |value_col|.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+    """
+    d = df.copy()
+    if label_col not in d.columns and "index" in d.columns:
+        d = d.rename(columns={"index": label_col})
+    d = d.assign(_abs=lambda x: x[value_col].abs()).sort_values("_abs", ascending=False).head(top)
+    s = d.set_index(label_col)[value_col]
+    ax = s.plot(kind="barh", figsize=(7, max(3, int(top * 0.45))))
+    ax.set_xlabel("Δ Revenue (absolute)")
+    ax.set_ylabel(label_col.title())
+    ax.axvline(0, linestyle="--", linewidth=1)
+    plt.tight_layout()
+    return ax
+
+
+def waterfall_revenue(total0: float, total1: float, contributions: pd.Series, title: str | None = None):
+    """
+    Simple waterfall plot showing per-product revenue contributions from baseline to scenario.
+
+    Parameters
+    ----------
+    total0 : float
+        Baseline total revenue.
+    total1 : float
+        Scenario total revenue.
+    contributions : pd.Series
+        Per-product absolute revenue change (should sum close to total1 - total0).
+    title : str | None
+        Optional title.
+
+    Returns
+    -------
+    matplotlib.axes.Axes
+    """
+    parts = contributions.sort_values(ascending=False)
+    cum = parts.cumsum()
+    idx = ["Baseline"] + parts.index.tolist() + ["Scenario"]
+    vals = [total0] + parts.tolist() + [total1]
+
+    # Bar positions and colors
+    x = np.arange(len(idx))
+    colors = ["#999999"] + ["#2ca02c" if v >= 0 else "#d62728" for v in parts] + ["#1f77b4"]
+
+    fig, ax = plt.subplots(figsize=(max(7, len(idx) * 0.5), 4))
+    ax.bar(x[0], total0, color=colors[0])
+    running = total0
+    for i, v in enumerate(parts, start=1):
+        running += v
+        ax.bar(x[i], v, bottom=running - v, color=colors[i])
+    ax.bar(x[-1], total1, color=colors[-1])
+    ax.set_xticks(x)
+    ax.set_xticklabels(idx, rotation=45, ha="right")
+    ax.set_ylabel("Revenue")
+    if title:
+        ax.set_title(title)
+    ax.axhline(total0, linestyle="--", linewidth=1)
     plt.tight_layout()
     return ax
