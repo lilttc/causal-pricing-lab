@@ -57,8 +57,8 @@ causal-pricing-lab/
 │ │ └─ forecasting.py
 │ └─ pricing.py
 └─ reports/
-├─ figures/
-└─ slides/pricing_insights.pdf
+└─ figures/
+
 
 ```
 ---
