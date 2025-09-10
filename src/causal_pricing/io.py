@@ -18,7 +18,7 @@ def read_csv(path: str | Path, **kwargs) -> pd.DataFrame:
 
 def to_parquet(df: pd.DataFrame, path: str | Path) -> None:
     """
-    Save DataFrame to Parquet (snappy). Creates parent dirs if needed.
+    Save DataFrame to Parquet. Creates parent dirs if needed.
     """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

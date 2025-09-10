@@ -217,7 +217,7 @@ def make_daily_product_city(
     revenue_col: str = REV_COL,
 ) -> pd.DataFrame:
     """
-    Aggregates to daily × product × city and computes quantity-weighted average price.
+    Aggregates to daily x product x city and computes quantity-weighted average price.
 
     Parameters
     ----------
